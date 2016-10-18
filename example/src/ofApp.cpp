@@ -1,76 +1,38 @@
 #include "ofApp.h"
 
-#include <opencv2/opencv.hpp>
-
-#include "FeatureComputer.hpp"
-#include "Classifier.h"
-#include "LcBasic.h"
-#include "HandDetector.hpp"
-
-#include "ofxCv.h"
-
-using namespace std;
-using namespace cv;
-
 //--------------------------------------------------------------
 void ofApp::setup(){
+    // if you want to change any of the options
+    // you need to do it here, before setup()
+    segmenter.setTargetWidth(320);
+    segmenter.setStepSize(3);
+    segmenter.setPath("handtracking");
+    segmenter.loadModels();
     
-    trackerReady = false;
-    
-    target_width = 320;			// for resizing the input (small is faster)
-    
-    // number of models used to compute a single pixel response
-    // must be less than the number of training models
-    // only used at test time
-    num_models_to_average = 10;
-    
-    // runs detector on every 'step_size' pixels
-    // only used at test time
-    // bigger means faster but you lose resolution
-    // you need post-processing to get contours
-    step_size = 3;
-    
-    // Assumes a certain file structure e.g., /root/img/basename/00000000.jpg
-    model_prefix = ofToDataPath("models"); // output path for learned models
-    globfeat_prefix = ofToDataPath("globfeats"); // output path for color histograms
-    
-    ofLog() << model_prefix;
-    ofLog() << globfeat_prefix;
-    
-    // types of features to use (you will over-fit if you do not have enough data)
-    // r: RGB (5x5 patch)
-    // v: HSV
-    // l: LAB
-    // b: BRIEF descriptor
-    // o: ORB descriptor
-    // s: SIFT descriptor
-    // u: SURF descriptor
-    // h: HOG descriptor
-    string feature_set = "rvl";
-    
-    hd.testInitialize(model_prefix,globfeat_prefix,feature_set,num_models_to_average,target_width);
-    
-    cap.setup(1280, 720);
-    
+    cam.setup(640, 480);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    cap.update();
-    if(cap.isFrameNew()) {
-        Mat im;
-        ofxCv::convertColor(cap, im, CV_RGB2BGR);
-        hd.test(im,num_models_to_average,step_size);
-        trackerReady = true;
+    cam.update();
+    if(cam.isFrameNew()) {
+        segmenter.detect(cam);
+        segmenter.getForegroundMask(foregroundMask);
+        foregroundMask.update();
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    if(trackerReady) {
-        Mat pp_contour = hd.postprocess(hd._response_img);		// binary contour
-        hd.colormap(pp_contour,pp_contour,0);					// colormap of contour
-        ofxCv::drawMat(pp_contour, target_width*2, 0);
+    // draw the camera as a background
+    cam.draw(0, 0);
+    
+    if(foregroundMask.isAllocated()) {
+        ofPushStyle();
+        // draw the mask as a semi-transparent colored overlay
+        ofSetColor(ofColor::magenta, 64);
+        foregroundMask.draw(0, 0, 640, 480);
+        ofPopStyle();
     }
 }
 
