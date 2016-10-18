@@ -1,3 +1,3 @@
 ofxCv
-ofxGui
 ofxOpenCv
+ofxPerPixelSegment

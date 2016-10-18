@@ -29,4 +29,4 @@ project.xcworkspace
 obj/
 bin/
 build/
-!data/
+data/
