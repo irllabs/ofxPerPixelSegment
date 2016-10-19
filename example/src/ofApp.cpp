@@ -2,11 +2,11 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    segmenter.setPath("new-handtracker");
+    segmenter.trainModels();
+    
     // if you want to change any of the options
-    // you need to do it here, before setup()
-    segmenter.setTargetWidth(320);
-    segmenter.setStepSize(3);
-    segmenter.setPath("handtracking");
+    // you need to do it here, before loadModels()
     segmenter.loadModels();
     
     cam.setup(640, 480);

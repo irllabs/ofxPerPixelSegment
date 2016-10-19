@@ -17,6 +17,7 @@ public:
     ,targetWidth(320)
     ,numModelsTest(10)
     ,stepSize(3)
+    ,path("handtracking")
     ,featureSet("rvl") {
     }
     
@@ -54,11 +55,35 @@ public:
     }
     
     void setPath(string path = "handtracking") {
-        modelPrefix = ofToDataPath(path + "/models");
-        globfeatPrefix = ofToDataPath(path + "/globfeat");
+        this->path = path;
+    }
+    
+    void trainModels() {
+        string modelPrefix = ofToDataPath(path + "/models");
+        string globfeatPrefix = ofToDataPath(path + "/globfeat");
+        string imgPrefix = ofToDataPath(path + "/img");
+        string maskPrefix = ofToDataPath(path + "/mask");
+        if(!ofDirectory(modelPrefix).exists() ||
+           !ofDirectory(globfeatPrefix).exists() ||
+           !ofDirectory(imgPrefix).exists() ||
+           !ofDirectory(maskPrefix).exists()) {
+            ofLog() << "Can't find one of these folders: model, globfeat, img, mask.";
+            return;
+        }
+        ofLog() << "Training...";
+        detector.loadMaskFilenames(maskPrefix);
+        detector.trainModels("", imgPrefix, maskPrefix, modelPrefix, globfeatPrefix, featureSet, numModelsTest, targetWidth);
+        ofLog() << "Done training.";
     }
     
     void loadModels() {
+        string modelPrefix = ofToDataPath(path + "/models");
+        string globfeatPrefix = ofToDataPath(path + "/globfeat");
+        if(!ofDirectory(modelPrefix).exists() ||
+           !ofDirectory(globfeatPrefix).exists()) {
+            ofLog() << "Can't find one of these folders: model, globfeat.";
+            return;
+        }
         detector.testInitialize(modelPrefix, globfeatPrefix, featureSet, numModelsTest, targetWidth);
         modelsLoaded = true;
     }
@@ -102,7 +127,7 @@ private:
     int stepSize;
     
     string featureSet;
-    string modelPrefix, globfeatPrefix;
+    string path;
     
     HandDetector detector;
 };
