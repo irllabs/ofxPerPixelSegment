@@ -15,7 +15,7 @@ public:
     :modelsLoaded(false)
     ,detectReady(false)
     ,targetWidth(320)
-    ,numModelsTest(10)
+    ,numModels(16)
     ,stepSize(3)
     ,path("handtracking")
     ,featureSet("rvl") {
@@ -29,8 +29,8 @@ public:
     // number of models used to compute a single pixel response
     // must be less than the number of training models
     // only used at test time
-    void setNumModelsTest(int numModelsTest) {
-        this->numModelsTest = numModelsTest;
+    void setNumModels(int numModels) {
+        this->numModels = numModels;
     }
     
     // runs detector on every 'step_size' pixels
@@ -72,7 +72,7 @@ public:
         }
         ofLog() << "Training...";
         detector.loadMaskFilenames(maskPrefix);
-        detector.trainModels("", imgPrefix, maskPrefix, modelPrefix, globfeatPrefix, featureSet, numModelsTest, targetWidth);
+        detector.trainModels("", imgPrefix, maskPrefix, modelPrefix, globfeatPrefix, featureSet, numModels, targetWidth);
         ofLog() << "Done training.";
     }
     
@@ -84,7 +84,7 @@ public:
             ofLog() << "Can't find one of these folders: model, globfeat.";
             return;
         }
-        detector.testInitialize(modelPrefix, globfeatPrefix, featureSet, numModelsTest, targetWidth);
+        detector.testInitialize(modelPrefix, globfeatPrefix, featureSet, numModels, targetWidth);
         modelsLoaded = true;
     }
     
@@ -100,7 +100,7 @@ public:
         ofxCv::convertColor(img, imgBgr, CV_RGB2BGR);
         
         // runt the detector
-        detector.test(imgBgr, numModelsTest, stepSize);
+        detector.test(imgBgr, numModels, stepSize);
         
         detectReady = true;
     }
@@ -123,7 +123,7 @@ private:
     bool detectReady;
     
     int targetWidth;
-    int numModelsTest;
+    int numModels;
     int stepSize;
     
     string featureSet;

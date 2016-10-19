@@ -2,11 +2,17 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    segmenter.setPath("new-handtracker");
-    segmenter.trainModels();
-    
     // if you want to change any of the options
-    // you need to do it here, before loadModels()
+    // you need to do it here, before trainModels()
+    // and before loadModels()
+    
+    // to train a new model, uncomment the following lines
+    // and make sure there are images in:
+    // data/new-handtracker/img/*.jpg
+    // data/new-handtracker/mask/*.jpg
+//    segmenter.setPath("new-handtracker");
+//    segmenter.trainModels();
+    
     segmenter.loadModels();
     
     cam.setup(640, 480);

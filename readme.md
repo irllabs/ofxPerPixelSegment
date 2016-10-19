@@ -8,3 +8,4 @@
 * Is it possible to print some progress in the console during training?
 * Besides checking that they exist, we should check that directories aren't empty just before loading.
 * Might want to make more examples of how to use the foreground mask. It looks like the library is internally running a contour finder so it would be good to expose those contours as a `vector<ofPolyline>` or something similar. ofxCv can convert from CV lines to ofPolylines.
+* A little work is needed to make this fully cross-platform, right now it should work on OSX and Linux but not on Windows due to the use of the `find` and other system commands. These could be replaced by OF calls.
